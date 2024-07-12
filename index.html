@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Summarizer</title>
+    <style>
+        @font-face {
+            font-family: 'DragonInktrap';
+            src: url(fonts/Dragon-Inktrap-BF64b9feda79567.ttf);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0; 
+            background: rgb(2,0,36);
+            background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(7,56,41,1) 35%, rgba(7,119,161,1) 100%);
+        }
+        .container {
+            max-width: 200px;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1{
+            text-align: center;
+            color: whitesmoke;
+            font-family: 'DragonInktrap';
+            font-size: 150px;
+        }
+        /* textarea {
+            width: 60%;
+            height: 150px;
+            resize: vertical;
+            border: 1px solid #ccc;
+            padding: 10px; 
+        } */
+        button {
+            background-color:#097956;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 20px;
+        }
+        .summary {
+            background: rgb(2,0,36);
+            background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(7,56,41,1) 35%, rgba(7,119,161,1) 100%);
+            border: 1px solid #ccc;
+            padding: 50px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 20px; 
+        }
+        .form{
+            text-align: center;
+            color: #f5f5f5;
+            font-size: 30px;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 60%;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>TEXT SUMMARIZER</h1>
+    <div class="form">
+        <form id="upload-form">
+            <label for="file-input">Choose a .txt file:</label>
+            <input type="file" id="file-input" accept=".txt" required>
+            <button type="submit">Summarize</button>
+            <div class="summary" id="summary-container">
+                
+            </div>
+        </form>
+    </div>
+    <!-- <div id="summary-container"> -->
+        <!-- Summarized content will be displayed here -->
+    <!-- </div> -->
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a .txt file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://127.0.0.1:5000/render', {  // Corrected the fetch URL here
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the summarized content on the page
+                const summaryContainer = document.getElementById('summary-container');
+                summaryContainer.innerHTML = '<h3>Summary:</h3><p>' + data + '</p>';
+                for (const sentence of data) {
+                    const paragraph = document.createElement('p');
+                    paragraph.textContent = sentence;
+                    summaryContainer.appendChild(paragraph);
+                }
+            })
+                        .catch(error => {
+                            console.error('Error fetching the summary:', error);
+                            alert('An error occurred while fetching the summary. Please try again.');
+                        });
+        });
+    </script>
+</body>
+</html>
